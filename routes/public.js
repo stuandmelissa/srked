@@ -1,7 +1,7 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import db from '../db.js';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 const router = express.Router();
 
@@ -28,19 +28,12 @@ async function getGlobalData() {
 }
 
 async function sendContactEmail(contact) {
-  if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER || !process.env.EMAIL_PASS) return;
-  const port = parseInt(process.env.EMAIL_PORT) || 587;
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port,
-    secure: port === 465,
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-  });
-  await transporter.sendMail({
-    from: `"SRK Consulting Website" <${process.env.EMAIL_USER}>`,
+  if (!process.env.RESEND_API_KEY) return;
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  await resend.emails.send({
+    from: 'SRK Consulting <noreply@updates.srked.com>',
     to: process.env.EMAIL_TO || 'info@srked.com',
-    subject: `New message from ${escapeHtml(contact.name)} — SRK Consulting`,
-    text: `Name: ${contact.name}\nEmail: ${contact.email}\nPhone: ${contact.phone || 'N/A'}\n\nMessage:\n${contact.message}`,
+    subject: `New message from ${contact.name} — SRK Consulting`,
     html: `
       <h2 style="color:#1B3A6B;">New Contact Form Submission</h2>
       <table style="border-collapse:collapse;width:100%;max-width:500px;">
