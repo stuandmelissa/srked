@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 
 const router = express.Router();
 
-const contactLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, standardHeaders: true, legacyHeaders: false });
+const contactLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: process.env.NODE_ENV === 'development' ? 100 : 5, standardHeaders: true, legacyHeaders: false });
 
 function escapeHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -29,10 +29,11 @@ async function getGlobalData() {
 
 async function sendContactEmail(contact) {
   if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER || !process.env.EMAIL_PASS) return;
+  const port = parseInt(process.env.EMAIL_PORT) || 587;
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT) || 587,
-    secure: false,
+    port,
+    secure: port === 465,
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
   });
   await transporter.sendMail({
@@ -102,8 +103,8 @@ router.post('/contact', contactLimiter, async (req, res, next) => {
       'INSERT INTO contacts (name, email, phone, message) VALUES (?, ?, ?, ?)',
       [name.trim(), email.trim(), phone ? phone.trim() : null, message.trim()]
     );
-    try { await sendContactEmail({ name: name.trim(), email: email.trim(), phone: phone?.trim(), message: message.trim() }); }
-    catch (err) { console.error('Email send failed:', err.message); }
+    sendContactEmail({ name: name.trim(), email: email.trim(), phone: phone?.trim(), message: message.trim() })
+      .catch(err => console.error('Email send failed:', err.message));
 
     res.redirect('/contact/success');
   } catch (err) { next(err); }

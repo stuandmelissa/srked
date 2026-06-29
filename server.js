@@ -4,6 +4,7 @@ import session from 'express-session';
 import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import db from './db.js';
 import adminRouter from './routes/admin.js';
 import publicRouter from './routes/public.js';
 
@@ -37,12 +38,20 @@ app.use(session({
 app.use('/admin', adminRouter);
 app.use('/', publicRouter);
 
-app.use((req, res) => res.status(404).render('404', { title: 'Page Not Found' }));
+app.use(async (req, res) => {
+  try {
+    const [navPages] = await db.query('SELECT slug, nav_label, page_type FROM pages WHERE show_in_nav=1 AND is_active=1 ORDER BY sort_order');
+    res.status(404).render('404', { title: 'Page Not Found', page: '', navPages, services: [], socialLinks: [] });
+  } catch { res.status(404).send('Page not found'); }
+});
 
 // Global error handler — never expose stack traces to the browser
-app.use((err, req, res, _next) => {
+app.use(async (err, req, res, _next) => {
   console.error(err.stack);
-  res.status(500).render('404', { title: 'Something went wrong' });
+  try {
+    const [navPages] = await db.query('SELECT slug, nav_label, page_type FROM pages WHERE show_in_nav=1 AND is_active=1 ORDER BY sort_order');
+    res.status(500).render('404', { title: 'Something went wrong', page: '', navPages, services: [], socialLinks: [] });
+  } catch { res.status(500).send('Something went wrong'); }
 });
 
 const PORT = process.env.PORT || 3000;

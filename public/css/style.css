@@ -485,6 +485,7 @@ h1, h2, h3, h4 {
 
 .success-section { text-align: center; padding: 6rem 1.5rem; }
 .success-icon    { font-size: 4rem; margin-bottom: 1rem; }
+.success-butterfly { width: 80px; height: auto; display: block; margin: 0 auto; }
 .success-section h2 { font-size: 2rem; margin-bottom: 1rem; }
 .success-section p  { color: var(--gray); max-width: 480px; margin: 0 auto 2rem; }
 
