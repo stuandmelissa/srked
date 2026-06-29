@@ -10,9 +10,9 @@
   <a href="/admin/logout" class="admin-logout">Log out</a>
 </header>
 
-<div id="adminNavOverlay" class="admin-nav-overlay" onclick="closeAdminNav()" hidden></div>
+<div id="adminNavOverlay" class="admin-nav-overlay" onclick="closeAdminNav()"></div>
 
-<nav id="adminNavPanel" class="admin-nav-panel" hidden aria-label="Admin navigation">
+<nav id="adminNavPanel" class="admin-nav-panel" aria-label="Admin navigation">
   <div class="admin-nav-section">
     <div class="admin-nav-section-label">Edit Content</div>
     <% navPages.forEach(p => { %>
@@ -62,15 +62,15 @@ document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
 function toggleAdminNav(btn) {
   const panel = document.getElementById('adminNavPanel');
   const overlay = document.getElementById('adminNavOverlay');
-  if (!panel.hidden) { closeAdminNav(); return; }
-  panel.hidden = false;
-  overlay.hidden = false;
+  if (panel.classList.contains('open')) { closeAdminNav(); return; }
+  panel.classList.add('open');
+  overlay.classList.add('open');
   btn.setAttribute('aria-expanded', 'true');
   document.body.style.overflow = 'hidden';
 }
 function closeAdminNav() {
-  document.getElementById('adminNavPanel').hidden = true;
-  document.getElementById('adminNavOverlay').hidden = true;
+  document.getElementById('adminNavPanel').classList.remove('open');
+  document.getElementById('adminNavOverlay').classList.remove('open');
   const btn = document.querySelector('.admin-menu-btn');
   if (btn) btn.setAttribute('aria-expanded', 'false');
   document.body.style.overflow = '';
