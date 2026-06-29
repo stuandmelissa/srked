@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import db from '../db.js';
+import nodemailer from 'nodemailer';
+
 const router = express.Router();
-const db = require('../db');
-const nodemailer = require('nodemailer');
 
 async function getContent(page) {
   const [rows] = await db.query(
@@ -98,4 +99,4 @@ router.get('/contact/success', (req, res) => {
   res.render('contact-success', { title: 'Message Sent — SRK Consulting', page: 'contact' });
 });
 
-module.exports = router;
+export default router;

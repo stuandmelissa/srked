@@ -1,6 +1,7 @@
 {
   "name": "srk-consulting",
   "version": "1.0.0",
+  "type": "module",
   "description": "SRK Consulting - Educational Consulting & Tutoring",
   "main": "server.js",
   "scripts": {

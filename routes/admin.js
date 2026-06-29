@@ -1,14 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const db = require('../db');
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import multer from 'multer';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import db from '../db.js';
 
-// Multer config for photo uploads
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const router = express.Router();
+
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../public/images')),
+  destination: (req, file, cb) => cb(null, join(__dirname, '../public/images')),
   filename: (req, file, cb) => cb(null, 'photo.jpg')
 });
 const upload = multer({
@@ -20,7 +21,6 @@ const upload = multer({
   }
 });
 
-// Auth middleware
 function requireAuth(req, res, next) {
   if (req.session && req.session.adminId) return next();
   res.redirect('/admin/login');
@@ -67,7 +67,6 @@ router.get('/', requireAuth, (req, res) => res.redirect('/admin/page/home'));
 // ─── Content editing ─────────────────────────────────────────────────────────
 
 const PAGES = ['home', 'about', 'services', 'contact'];
-const ALL_PAGES = [...PAGES, 'settings'];
 
 router.get('/settings', requireAuth, async (req, res) => {
   const unreadCount = await getUnreadCount();
@@ -95,7 +94,6 @@ router.get('/page/:pageName', requireAuth, async (req, res) => {
   });
 });
 
-// AJAX save for a single content field
 router.post('/api/content', requireAuth, async (req, res) => {
   const { page, section_key, value } = req.body;
   if (!page || !section_key) return res.status(400).json({ ok: false });
@@ -106,12 +104,10 @@ router.post('/api/content', requireAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
-// Photo upload
 router.post('/api/photo', requireAuth, upload.single('photo'), (req, res) => {
   res.json({ ok: true, path: '/images/photo.jpg?t=' + Date.now() });
 });
 
-// Change password
 router.post('/api/password', requireAuth, async (req, res) => {
   const { current, newpass, confirm } = req.body;
   if (newpass !== confirm) return res.json({ ok: false, error: 'New passwords do not match.' });
@@ -144,4 +140,4 @@ router.post('/api/messages/:id/delete', requireAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
-module.exports = router;
+export default router;

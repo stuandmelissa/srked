@@ -1,6 +1,12 @@
-require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
-const mysql = require('mysql2/promise');
-const bcrypt = require('bcryptjs');
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import dotenv from 'dotenv';
+import mysql from 'mysql2/promise';
+import bcrypt from 'bcryptjs';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: join(__dirname, '../.env') });
 
 const DB_NAME = process.env.DB_NAME || 'srk_consulting';
 
@@ -38,6 +44,7 @@ async function setup() {
 
   const conn = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT || '3306'),
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     multipleStatements: true,
@@ -84,7 +91,6 @@ async function setup() {
   `);
   console.log('✓ Table: admins');
 
-  // Seed content (INSERT IGNORE so existing edits are preserved)
   for (const row of contentSeed) {
     await conn.query(
       `INSERT IGNORE INTO content (page, section_key, label, content_type, value, sort_order)
@@ -94,7 +100,6 @@ async function setup() {
   }
   console.log(`✓ Seeded ${contentSeed.length} content items`);
 
-  // Create default admin if none exists
   const [existing] = await conn.query('SELECT id FROM admins LIMIT 1');
   if (existing.length === 0) {
     const defaultPassword = 'SRKadmin2024';

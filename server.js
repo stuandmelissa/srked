@@ -1,16 +1,21 @@
-require('dotenv').config();
-const express = require('express');
-const session = require('express-session');
-const path = require('path');
+import 'dotenv/config';
+import express from 'express';
+import session from 'express-session';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import publicRouter from './routes/public.js';
+import adminRouter from './routes/admin.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(join(__dirname, 'public')));
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'srk-dev-secret',
@@ -22,8 +27,8 @@ app.use(session({
   }
 }));
 
-app.use('/', require('./routes/public'));
-app.use('/admin', require('./routes/admin'));
+app.use('/', publicRouter);
+app.use('/admin', adminRouter);
 
 app.use((req, res) => {
   res.status(404).render('404', { title: 'Page Not Found' });
