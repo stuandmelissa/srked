@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "build": "node db/setup.js",
-    "start": "node server.js",
+    "start": "node db/setup.js && node server.js",
     "dev": "nodemon server.js",
     "setup": "node db/setup.js"
   },
