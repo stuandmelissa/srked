@@ -9,53 +9,48 @@
 </head>
 <body class="admin-body">
 
-<header class="admin-header">
-  <div class="admin-header-inner">
-    <a href="/admin" class="admin-brand">
-      <%- include('../partials/butterfly', { bfClass: 'nav-butterfly' }) %>
-      <span>SRK Admin</span>
-    </a>
-    <a href="/admin/logout" class="admin-logout">Log out</a>
-  </div>
-  <nav class="admin-tabs" aria-label="Admin navigation">
-    <% navPages.forEach(p => { %>
-      <a href="/admin/page/<%= p.slug %>" class="admin-tab"><%= p.nav_label %></a>
-    <% }) %>
-    <a href="/admin/services" class="admin-tab active">⚙ Services</a>
-    <a href="/admin/pages" class="admin-tab">⚙ Pages</a>
-    <a href="/admin/messages" class="admin-tab">Messages<% if (unreadCount > 0) { %> <span class="badge"><%= unreadCount %></span><% } %></a>
-    <a href="/admin/settings" class="admin-tab">Settings</a>
-  </nav>
-</header>
+<%- include('../partials/admin-nav', { navPages, unreadCount, pageName: 'services' }) %>
 
 <main class="admin-main">
   <div class="content-card">
-    <h2 style="margin-bottom:1.5rem;color:var(--blue);">My Services</h2>
-    <p style="margin-bottom:1.5rem;color:#666;">Add, edit, or remove the services shown on your website. Drag to reorder (coming soon).</p>
+    <h2 style="margin-bottom:0.5rem;color:var(--blue);">My Services</h2>
+    <p style="margin-bottom:1.5rem;color:#666;font-size:0.92rem;">Tap an icon to change it. Edit the title and description, then tap Save.</p>
 
     <div id="servicesList">
       <% services.forEach(s => { %>
         <div class="service-item" data-id="<%= s.id %>">
-          <div class="service-item-icon"><input type="text" class="svc-icon" value="<%= s.icon %>" maxlength="5" placeholder="emoji"></div>
+          <div class="svc-icon-wrap">
+            <button type="button" class="icon-preview-btn" onclick="toggleIconPicker(this)" title="Tap to change icon">
+              <i data-lucide="<%= s.icon %>"></i>
+            </button>
+            <input type="hidden" class="svc-icon" value="<%= s.icon %>">
+            <div class="icon-picker-grid" hidden></div>
+          </div>
           <div class="service-item-fields">
             <input type="text" class="svc-title" value="<%= s.title %>" placeholder="Service title" maxlength="200">
             <textarea class="svc-desc" rows="2" placeholder="Description" maxlength="1000"><%= s.description %></textarea>
           </div>
           <div class="service-item-actions">
-            <button class="btn-save-svc btn-sm btn-gold" onclick="saveService(<%= s.id %>, this)">Save</button>
-            <button class="btn-del-svc btn-sm btn-danger" onclick="deleteService(<%= s.id %>, this)">Delete</button>
+            <button class="btn-sm btn-gold" onclick="saveService(<%= s.id %>, this)">Save</button>
+            <button class="btn-sm btn-danger" onclick="deleteService(<%= s.id %>, this)">Delete</button>
           </div>
         </div>
       <% }) %>
     </div>
 
-    <div class="add-item-form" style="margin-top:2rem;">
-      <h3 style="margin-bottom:1rem;font-size:1rem;">Add a New Service</h3>
-      <div class="add-service-row">
-        <input type="text" id="newIcon" placeholder="Icon (emoji)" value="✏️" maxlength="5" style="width:70px;">
-        <input type="text" id="newTitle" placeholder="Service title" maxlength="200" style="flex:1;">
+    <div class="add-item-form" style="margin-top:2rem;border-top:1px solid #eee;padding-top:1.5rem;">
+      <h3 style="margin-bottom:1rem;font-size:1rem;color:var(--blue);">Add a New Service</h3>
+      <div style="display:flex;align-items:flex-start;gap:0.75rem;flex-wrap:wrap;">
+        <div class="svc-icon-wrap">
+          <button type="button" class="icon-preview-btn" onclick="toggleIconPicker(this)" title="Tap to choose icon">
+            <i data-lucide="pencil-line"></i>
+          </button>
+          <input type="hidden" id="newIcon" value="pencil-line">
+          <div class="icon-picker-grid" hidden></div>
+        </div>
+        <input type="text" id="newTitle" placeholder="Service title" maxlength="200" style="flex:1;min-width:180px;">
       </div>
-      <textarea id="newDesc" rows="2" placeholder="Brief description of this service..." maxlength="1000" style="width:100%;margin-top:0.5rem;"></textarea>
+      <textarea id="newDesc" rows="2" placeholder="Brief description of this service..." maxlength="1000" style="width:100%;margin-top:0.75rem;"></textarea>
       <button class="btn btn-gold" style="margin-top:0.75rem;" onclick="addService()">+ Add Service</button>
       <p id="addMsg" style="margin-top:0.5rem;color:var(--green);display:none;">✓ Service added!</p>
     </div>
@@ -63,6 +58,40 @@
 </main>
 
 <script>
+const SERVICE_ICONS = [
+  'book-open','pencil-line','graduation-cap','lightbulb','users','star','award',
+  'target','clipboard-list','calendar','search','file-text','check-circle',
+  'briefcase','brain','trophy','heart','compass','notebook','user-check',
+  'map','bookmark','pen-tool','layers','school','route'
+];
+
+function buildPickerGrid(grid) {
+  grid.innerHTML = SERVICE_ICONS.map(ico =>
+    `<button type="button" class="icon-opt" data-icon="${ico}" onclick="selectIcon(this)" title="${ico}"><i data-lucide="${ico}"></i></button>`
+  ).join('');
+  lucide.createIcons({ el: grid });
+}
+
+function toggleIconPicker(btn) {
+  const wrap = btn.closest('.svc-icon-wrap');
+  const grid = wrap.querySelector('.icon-picker-grid');
+  if (!grid.hidden) { grid.hidden = true; return; }
+  if (!grid.children.length) buildPickerGrid(grid);
+  document.querySelectorAll('.icon-picker-grid').forEach(g => { if (g !== grid) g.hidden = true; });
+  grid.hidden = false;
+}
+
+function selectIcon(btn) {
+  const ico = btn.dataset.icon;
+  const wrap = btn.closest('.svc-icon-wrap');
+  const input = wrap.querySelector('[type="hidden"]');
+  const preview = wrap.querySelector('.icon-preview-btn');
+  input.value = ico;
+  preview.innerHTML = `<i data-lucide="${ico}"></i>`;
+  lucide.createIcons({ el: preview });
+  wrap.querySelector('.icon-picker-grid').hidden = true;
+}
+
 async function saveService(id, btn) {
   const row = btn.closest('.service-item');
   const title = row.querySelector('.svc-title').value;
@@ -83,7 +112,7 @@ async function deleteService(id, btn) {
 }
 
 async function addService() {
-  const icon = document.getElementById('newIcon').value.trim() || '✏️';
+  const icon = document.getElementById('newIcon').value || 'pencil-line';
   const title = document.getElementById('newTitle').value.trim();
   const description = document.getElementById('newDesc').value.trim();
   if (!title) { alert('Please enter a title for the service.'); return; }
@@ -94,6 +123,12 @@ async function addService() {
     setTimeout(() => location.reload(), 800);
   } else alert(d.error || 'Could not add service.');
 }
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.svc-icon-wrap')) {
+    document.querySelectorAll('.icon-picker-grid').forEach(g => g.hidden = true);
+  }
+});
 </script>
 </body>
 </html>

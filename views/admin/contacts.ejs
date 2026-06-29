@@ -4,29 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Messages — SRK Consulting Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
-<body>
+<body class="admin-body">
 
-<header class="admin-header">
-  <h1>SRK <span>Admin</span></h1>
-  <a href="/admin/logout" class="admin-logout">Log Out</a>
-</header>
+<%- include('../partials/admin-nav', { navPages, unreadCount, pageName: 'messages' }) %>
 
-<nav class="admin-tabs" role="navigation" aria-label="Admin navigation">
-  <% pages.forEach(p => { %>
-    <a href="/admin/page/<%= p %>" class="admin-tab">
-      <%= p.charAt(0).toUpperCase() + p.slice(1) %>
-    </a>
-  <% }) %>
-  <a href="/admin/messages" class="admin-tab active">
-    Messages
-    <% if (unreadCount > 0) { %><span class="badge"><%= unreadCount %></span><% } %>
-  </a>
-  <a href="/admin/settings" class="admin-tab">⚙️ Settings</a>
-</nav>
-
-<main class="admin-body">
+<main class="admin-main">
   <div class="admin-intro">
     <strong><%= contacts.length %></strong> message<%= contacts.length !== 1 ? 's' : '' %> total.
     <% if (unreadCount > 0) { %><strong style="color:#dc3545;"><%= unreadCount %> unread.</strong><% } else { %>All caught up!<% } %>

@@ -27,10 +27,10 @@ const contentSeed = [
 ];
 
 const servicesSeed = [
-  { title: 'Educational Consulting',    description: 'Navigating educational options can be overwhelming. I help families understand their choices, interpret evaluations, advocate within school systems, and create action plans that set students up for success.',                                                                    icon: '🗺️', sort_order: 1 },
-  { title: 'Academic Tutoring',         description: "One-on-one tutoring sessions in core subjects, tailored to your student's learning style. I work with students from elementary through high school on reading, writing, math, and more.",                                                                                     icon: '📝', sort_order: 2 },
-  { title: 'College Planning',          description: 'From selecting the right courses in high school to crafting a compelling college application, I guide students and families through every step of the college planning process.',                                                                                                icon: '🎓', sort_order: 3 },
-  { title: 'Learning Strategy Coaching',description: 'Teaching students the organizational skills, study strategies, and growth mindset they need to become confident, independent learners — skills that will serve them for life.',                                                                                                 icon: '💡', sort_order: 4 },
+  { title: 'Educational Consulting',    description: 'Navigating educational options can be overwhelming. I help families understand their choices, interpret evaluations, advocate within school systems, and create action plans that set students up for success.',                                                                    icon: 'compass',         sort_order: 1 },
+  { title: 'Academic Tutoring',         description: "One-on-one tutoring sessions in core subjects, tailored to your student's learning style. I work with students from elementary through high school on reading, writing, math, and more.",                                                                                     icon: 'pencil-line',     sort_order: 2 },
+  { title: 'College Planning',          description: 'From selecting the right courses in high school to crafting a compelling college application, I guide students and families through every step of the college planning process.',                                                                                                icon: 'graduation-cap',  sort_order: 3 },
+  { title: 'Learning Strategy Coaching',description: 'Teaching students the organizational skills, study strategies, and growth mindset they need to become confident, independent learners — skills that will serve them for life.',                                                                                                 icon: 'lightbulb',       sort_order: 4 },
 ];
 
 const pagesSeed = [
@@ -110,9 +110,9 @@ async function setup() {
   await conn.query(`
     CREATE TABLE IF NOT EXISTS services (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      title VARCHAR(200) NOT NULL,
+      title VARCHAR(200) NOT NULL UNIQUE,
       description TEXT,
-      icon VARCHAR(20) DEFAULT '✏️',
+      icon VARCHAR(50) DEFAULT 'pencil-line',
       sort_order INT DEFAULT 0,
       is_active TINYINT(1) DEFAULT 1
     )
@@ -173,6 +173,11 @@ async function setup() {
     )
   `);
 
+  // Ensure unique constraint on services.title (idempotent)
+  try {
+    await conn.query(`CREATE UNIQUE INDEX services_title_uq ON services (title)`);
+  } catch { /* already exists */ }
+
   console.log('✓ Tables ready');
 
   for (const row of contentSeed) {
@@ -200,6 +205,20 @@ async function setup() {
     await conn.query(
       `INSERT IGNORE INTO social_links (platform, label, url, is_enabled, sort_order) VALUES (?, ?, '', 0, ?)`,
       [s.platform, s.label, s.sort_order]
+    );
+  }
+
+  // Migrate any leftover emoji icons to lucide names
+  const emojiMap = [
+    ['compass',        'Educational Consulting'],
+    ['pencil-line',    'Academic Tutoring'],
+    ['graduation-cap', 'College Planning'],
+    ['lightbulb',      'Learning Strategy Coaching'],
+  ];
+  for (const [icon, title] of emojiMap) {
+    await conn.query(
+      `UPDATE services SET icon=? WHERE title=? AND icon NOT REGEXP '^[a-z][a-z0-9-]+$'`,
+      [icon, title]
     );
   }
 

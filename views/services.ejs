@@ -12,7 +12,7 @@
     <div class="services-page-grid">
       <% services.forEach(s => { %>
         <div class="service-detail-card">
-          <div class="service-icon"><%= s.icon %></div>
+          <div class="service-icon"><i data-lucide="<%= s.icon %>"></i></div>
           <h3><%= s.title %></h3>
           <p><%= s.description %></p>
         </div>

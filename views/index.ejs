@@ -30,7 +30,7 @@
     <div class="services-grid">
       <% services.slice(0, 4).forEach(s => { %>
         <div class="service-card">
-          <div class="service-icon"><%= s.icon %></div>
+          <div class="service-icon"><i data-lucide="<%= s.icon %>"></i></div>
           <h3><%= s.title %></h3>
           <p><%= s.description %></p>
         </div>

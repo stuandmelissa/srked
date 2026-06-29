@@ -9,24 +9,7 @@
 </head>
 <body class="admin-body">
 
-<header class="admin-header">
-  <div class="admin-header-inner">
-    <a href="/admin" class="admin-brand">
-      <%- include('../partials/butterfly', { bfClass: 'nav-butterfly' }) %>
-      <span>SRK Admin</span>
-    </a>
-    <a href="/admin/logout" class="admin-logout">Log out</a>
-  </div>
-  <nav class="admin-tabs" aria-label="Admin navigation">
-    <% navPages.forEach(p => { %>
-      <a href="/admin/page/<%= p.slug %>" class="admin-tab"><%= p.nav_label %></a>
-    <% }) %>
-    <a href="/admin/services" class="admin-tab">⚙ Services</a>
-    <a href="/admin/pages" class="admin-tab active">⚙ Pages</a>
-    <a href="/admin/messages" class="admin-tab">Messages<% if (unreadCount > 0) { %> <span class="badge"><%= unreadCount %></span><% } %></a>
-    <a href="/admin/settings" class="admin-tab">Settings</a>
-  </nav>
-</header>
+<%- include('../partials/admin-nav', { navPages, unreadCount, pageName: 'pages' }) %>
 
 <main class="admin-main">
   <div class="content-card">
@@ -38,22 +21,22 @@
       <tbody>
         <% pages.forEach(p => { %>
           <tr id="page-row-<%= p.id %>">
-            <td>
+            <td data-label="Page">
               <strong><%= p.nav_label %></strong>
               <span class="page-type-badge"><%= p.page_type %></span>
               <% if (p.is_builtin) { %><span class="builtin-badge">built-in</span><% } %>
             </td>
-            <td>
+            <td data-label="Active">
               <button class="toggle-btn <%= p.is_active ? 'on' : 'off' %>" onclick="togglePage(<%= p.id %>, 'active', this)">
                 <%= p.is_active ? 'On' : 'Off' %>
               </button>
             </td>
-            <td>
+            <td data-label="In Nav">
               <button class="toggle-btn <%= p.show_in_nav ? 'on' : 'off' %>" onclick="togglePage(<%= p.id %>, 'nav', this)">
                 <%= p.show_in_nav ? 'Shown' : 'Hidden' %>
               </button>
             </td>
-            <td>
+            <td data-label="Actions">
               <a href="/admin/page/<%= p.slug %>" class="btn-sm btn-gold">Edit</a>
               <% if (!p.is_builtin) { %>
                 <button class="btn-sm btn-danger" onclick="deletePage(<%= p.id %>, this)">Delete</button>
