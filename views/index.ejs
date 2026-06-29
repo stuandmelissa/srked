@@ -28,26 +28,13 @@
     <p class="section-label">What I Offer</p>
     <h2 class="section-title">How I Can Help</h2>
     <div class="services-grid">
-      <div class="service-card">
-        <div class="service-icon">🗺️</div>
-        <h3><%= servicesContent.service_1_title %></h3>
-        <p><%= servicesContent.service_1_text %></p>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">📝</div>
-        <h3><%= servicesContent.service_2_title %></h3>
-        <p><%= servicesContent.service_2_text %></p>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">🎓</div>
-        <h3><%= servicesContent.service_3_title %></h3>
-        <p><%= servicesContent.service_3_text %></p>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">💡</div>
-        <h3><%= servicesContent.service_4_title %></h3>
-        <p><%= servicesContent.service_4_text %></p>
-      </div>
+      <% services.slice(0, 4).forEach(s => { %>
+        <div class="service-card">
+          <div class="service-icon"><%= s.icon %></div>
+          <h3><%= s.title %></h3>
+          <p><%= s.description %></p>
+        </div>
+      <% }) %>
     </div>
     <div class="text-center" style="margin-top:2.5rem;">
       <a href="/services" class="btn btn-gold">See All Services</a>

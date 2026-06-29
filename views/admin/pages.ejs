@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pages — Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+<header class="admin-header">
+  <div class="admin-header-inner">
+    <a href="/admin" class="admin-brand">
+      <%- include('../partials/butterfly', { bfClass: 'nav-butterfly' }) %>
+      <span>SRK Admin</span>
+    </a>
+    <a href="/admin/logout" class="admin-logout">Log out</a>
+  </div>
+  <nav class="admin-tabs" aria-label="Admin navigation">
+    <% navPages.forEach(p => { %>
+      <a href="/admin/page/<%= p.slug %>" class="admin-tab"><%= p.nav_label %></a>
+    <% }) %>
+    <a href="/admin/services" class="admin-tab">⚙ Services</a>
+    <a href="/admin/pages" class="admin-tab active">⚙ Pages</a>
+    <a href="/admin/messages" class="admin-tab">Messages<% if (unreadCount > 0) { %> <span class="badge"><%= unreadCount %></span><% } %></a>
+    <a href="/admin/settings" class="admin-tab">Settings</a>
+  </nav>
+</header>
+
+<main class="admin-main">
+  <div class="content-card">
+    <h2 style="margin-bottom:0.5rem;color:var(--blue);">Manage Pages</h2>
+    <p style="margin-bottom:1.5rem;color:#666;">Turn pages on or off, control what shows in the navigation, or add new pages.</p>
+
+    <table class="pages-table">
+      <thead><tr><th>Page</th><th>Active</th><th>In Nav</th><th>Actions</th></tr></thead>
+      <tbody>
+        <% pages.forEach(p => { %>
+          <tr id="page-row-<%= p.id %>">
+            <td>
+              <strong><%= p.nav_label %></strong>
+              <span class="page-type-badge"><%= p.page_type %></span>
+              <% if (p.is_builtin) { %><span class="builtin-badge">built-in</span><% } %>
+            </td>
+            <td>
+              <button class="toggle-btn <%= p.is_active ? 'on' : 'off' %>" onclick="togglePage(<%= p.id %>, 'active', this)">
+                <%= p.is_active ? 'On' : 'Off' %>
+              </button>
+            </td>
+            <td>
+              <button class="toggle-btn <%= p.show_in_nav ? 'on' : 'off' %>" onclick="togglePage(<%= p.id %>, 'nav', this)">
+                <%= p.show_in_nav ? 'Shown' : 'Hidden' %>
+              </button>
+            </td>
+            <td>
+              <a href="/admin/page/<%= p.slug %>" class="btn-sm btn-gold">Edit</a>
+              <% if (!p.is_builtin) { %>
+                <button class="btn-sm btn-danger" onclick="deletePage(<%= p.id %>, this)">Delete</button>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-card" style="margin-top:1.5rem;">
+    <h3 style="margin-bottom:1rem;color:var(--blue);">Add a New Page</h3>
+    <p style="margin-bottom:1rem;color:#666;">Choose a page type to add. Each type can only be added once.</p>
+
+    <div class="page-templates">
+      <div class="page-template-card" onclick="selectTemplate('testimonials')">
+        <div class="pt-icon">⭐</div>
+        <h4>Testimonials</h4>
+        <p>Share what families say about working with you.</p>
+      </div>
+      <div class="page-template-card" onclick="selectTemplate('faq')">
+        <div class="pt-icon">❓</div>
+        <h4>FAQ</h4>
+        <p>Answer common questions parents and students ask.</p>
+      </div>
+      <div class="page-template-card" onclick="selectTemplate('resources')">
+        <div class="pt-icon">📚</div>
+        <h4>Resources</h4>
+        <p>Share helpful links and materials for families.</p>
+      </div>
+      <div class="page-template-card" onclick="selectTemplate('pricing')">
+        <div class="pt-icon">💰</div>
+        <h4>Pricing</h4>
+        <p>Display your rates and service packages.</p>
+      </div>
+    </div>
+
+    <div id="addPageForm" style="display:none;margin-top:1.5rem;padding:1.25rem;background:#f8f9fa;border-radius:8px;">
+      <h4 id="addPageFormTitle" style="margin-bottom:1rem;"></h4>
+      <input type="hidden" id="selectedType">
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <label style="display:block;margin-bottom:0.3rem;font-weight:600;">Page Title (browser tab)</label>
+          <input type="text" id="pageTitle" maxlength="200" style="width:100%;">
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <label style="display:block;margin-bottom:0.3rem;font-weight:600;">Nav Label (shown in menu)</label>
+          <input type="text" id="pageNav" maxlength="100" style="width:100%;">
+        </div>
+      </div>
+      <div style="margin-top:1rem;display:flex;gap:0.75rem;">
+        <button class="btn btn-gold" onclick="addPage()">Create Page</button>
+        <button class="btn btn-outline-blue" onclick="document.getElementById('addPageForm').style.display='none'">Cancel</button>
+      </div>
+      <p id="addPageMsg" style="margin-top:0.5rem;color:var(--green);display:none;"></p>
+    </div>
+  </div>
+</main>
+
+<script>
+const DEFAULTS = {
+  testimonials: { title: 'Testimonials', nav: 'Testimonials' },
+  faq:          { title: 'FAQ',          nav: 'FAQ' },
+  resources:    { title: 'Resources',    nav: 'Resources' },
+  pricing:      { title: 'Pricing',      nav: 'Pricing' },
+};
+
+function selectTemplate(type) {
+  const d = DEFAULTS[type];
+  document.getElementById('selectedType').value = type;
+  document.getElementById('pageTitle').value = d.title;
+  document.getElementById('pageNav').value = d.nav;
+  document.getElementById('addPageFormTitle').textContent = `Add ${d.title} Page`;
+  document.getElementById('addPageForm').style.display = 'block';
+  document.getElementById('addPageMsg').style.display = 'none';
+  document.getElementById('addPageForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+async function addPage() {
+  const page_type = document.getElementById('selectedType').value;
+  const custom_title = document.getElementById('pageTitle').value.trim();
+  const custom_nav = document.getElementById('pageNav').value.trim();
+  if (!custom_title || !custom_nav) { alert('Please fill in both fields.'); return; }
+  const r = await fetch('/admin/api/pages', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({page_type, custom_title, custom_nav}) });
+  const d = await r.json();
+  if (d.ok) {
+    document.getElementById('addPageMsg').textContent = '✓ Page created! Reloading...';
+    document.getElementById('addPageMsg').style.display = 'block';
+    setTimeout(() => location.reload(), 900);
+  } else {
+    alert(d.error || 'Could not create page. It may already exist.');
+  }
+}
+
+async function togglePage(id, type, btn) {
+  const url = type === 'nav' ? `/admin/api/pages/${id}/toggle-nav` : `/admin/api/pages/${id}/toggle`;
+  const r = await fetch(url, { method:'POST' });
+  const d = await r.json();
+  if (d.ok) {
+    const isOn = btn.classList.contains('off');
+    btn.classList.toggle('on', isOn);
+    btn.classList.toggle('off', !isOn);
+    btn.textContent = isOn ? (type === 'nav' ? 'Shown' : 'On') : (type === 'nav' ? 'Hidden' : 'Off');
+  }
+}
+
+async function deletePage(id, btn) {
+  if (!confirm('Delete this page? This cannot be undone.')) return;
+  const r = await fetch(`/admin/api/pages/${id}/delete`, { method:'POST' });
+  const d = await r.json();
+  if (d.ok) document.getElementById(`page-row-${id}`).remove();
+  else alert(d.error || 'Could not delete page.');
+}
+</script>
+</body>
+</html>

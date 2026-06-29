@@ -1,0 +1,35 @@
+<%- include('partials/header', { title, page, navPages, socialLinks }) %>
+
+<div class="page-banner">
+  <div class="container">
+    <h1><%= content.page_title %></h1>
+    <% if (content.intro_text) { %><p><%= content.intro_text %></p><% } %>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <% if (items.length === 0) { %>
+      <p style="text-align:center;color:#888;">No questions yet — check back soon!</p>
+    <% } else { %>
+      <div class="faq-list">
+        <% items.forEach(item => { %>
+          <details class="faq-item">
+            <summary class="faq-question"><%= item.question %></summary>
+            <div class="faq-answer"><p><%= item.answer %></p></div>
+          </details>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<section class="cta-banner">
+  <div class="container">
+    <h2>Still Have Questions?</h2>
+    <p>I'm happy to talk through anything. Reach out any time.</p>
+    <a href="/contact" class="btn btn-outline">Contact Me</a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

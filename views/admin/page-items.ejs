@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= page.title %> — Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+<header class="admin-header">
+  <div class="admin-header-inner">
+    <a href="/admin" class="admin-brand">
+      <%- include('../partials/butterfly', { bfClass: 'nav-butterfly' }) %>
+      <span>SRK Admin</span>
+    </a>
+    <a href="/admin/logout" class="admin-logout">Log out</a>
+  </div>
+  <nav class="admin-tabs" aria-label="Admin navigation">
+    <% navPages.forEach(p => { %>
+      <a href="/admin/page/<%= p.slug %>" class="admin-tab <%= pageName === p.slug ? 'active' : '' %>"><%= p.nav_label %></a>
+    <% }) %>
+    <a href="/admin/services" class="admin-tab">⚙ Services</a>
+    <a href="/admin/pages" class="admin-tab">⚙ Pages</a>
+    <a href="/admin/messages" class="admin-tab">Messages<% if (unreadCount > 0) { %> <span class="badge"><%= unreadCount %></span><% } %></a>
+    <a href="/admin/settings" class="admin-tab">Settings</a>
+  </nav>
+</header>
+
+<main class="admin-main">
+
+  <!-- Existing items -->
+  <div class="content-card">
+    <h2 style="margin-bottom:1.5rem;color:var(--blue);"><%= page.title %></h2>
+
+    <% if (items.length === 0) { %>
+      <p style="color:#888;text-align:center;padding:2rem 0;">No items yet — add your first one below.</p>
+    <% } else { %>
+      <div id="itemsList">
+        <% items.forEach(item => { %>
+          <div class="item-row" data-id="<%= item.id %>">
+            <% if (itemType === 'testimonials') { %>
+              <div class="item-row-content">
+                <p><strong>"<%= item.quote %>"</strong></p>
+                <p style="color:#666;margin-top:0.3rem;">— <%= item.client_name %><% if (item.role) { %>, <%= item.role %><% } %></p>
+              </div>
+            <% } else if (itemType === 'faq') { %>
+              <div class="item-row-content">
+                <p><strong>Q: <%= item.question %></strong></p>
+                <p style="color:#666;margin-top:0.3rem;">A: <%= item.answer %></p>
+              </div>
+            <% } else if (itemType === 'resources') { %>
+              <div class="item-row-content">
+                <p><strong><%= item.title %></strong></p>
+                <% if (item.description) { %><p style="color:#666;margin-top:0.2rem;"><%= item.description %></p><% } %>
+                <% if (item.url) { %><p style="margin-top:0.2rem;"><a href="<%= item.url %>" target="_blank" style="color:var(--blue);">↗ <%= item.url %></a></p><% } %>
+              </div>
+            <% } %>
+            <button class="btn-sm btn-danger" onclick="deleteItem('<%= itemType %>', <%= item.id %>, this)">Delete</button>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Add new item -->
+  <div class="content-card" style="margin-top:1.5rem;">
+    <h3 style="margin-bottom:1.25rem;color:var(--blue);">
+      <% if (itemType === 'testimonials') { %>Add a Testimonial
+      <% } else if (itemType === 'faq') { %>Add a FAQ Item
+      <% } else { %>Add a Resource<% } %>
+    </h3>
+
+    <% if (itemType === 'testimonials') { %>
+      <div class="form-group"><label>Client Name <span style="color:#c00">*</span></label><input type="text" id="f_client_name" maxlength="200" placeholder="e.g. Sarah M."></div>
+      <div class="form-group"><label>Role / Description <span style="color:#999;font-weight:400">(optional)</span></label><input type="text" id="f_role" maxlength="200" placeholder="e.g. Parent of 4th grader"></div>
+      <div class="form-group"><label>Quote <span style="color:#c00">*</span></label><textarea id="f_quote" rows="3" placeholder="What they said about working with you..."></textarea></div>
+      <button class="btn btn-gold" onclick="addItem('testimonials')">+ Add Testimonial</button>
+
+    <% } else if (itemType === 'faq') { %>
+      <div class="form-group"><label>Question <span style="color:#c00">*</span></label><input type="text" id="f_question" maxlength="500" placeholder="e.g. What age students do you work with?"></div>
+      <div class="form-group"><label>Answer <span style="color:#c00">*</span></label><textarea id="f_answer" rows="3" placeholder="Your answer..."></textarea></div>
+      <button class="btn btn-gold" onclick="addItem('faq')">+ Add Question</button>
+
+    <% } else if (itemType === 'resources') { %>
+      <div class="form-group"><label>Title <span style="color:#c00">*</span></label><input type="text" id="f_title" maxlength="200" placeholder="Resource name"></div>
+      <div class="form-group"><label>Description <span style="color:#999;font-weight:400">(optional)</span></label><input type="text" id="f_description" maxlength="500" placeholder="Brief description"></div>
+      <div class="form-group"><label>Link / URL <span style="color:#999;font-weight:400">(optional)</span></label><input type="url" id="f_url" maxlength="500" placeholder="https://..."></div>
+      <button class="btn btn-gold" onclick="addItem('resources')">+ Add Resource</button>
+    <% } %>
+
+    <p id="addItemMsg" style="margin-top:0.75rem;color:var(--green);display:none;"></p>
+  </div>
+</main>
+
+<script>
+async function addItem(type) {
+  let body = {};
+  if (type === 'testimonials') {
+    body = { client_name: document.getElementById('f_client_name').value, role: document.getElementById('f_role').value, quote: document.getElementById('f_quote').value };
+  } else if (type === 'faq') {
+    body = { question: document.getElementById('f_question').value, answer: document.getElementById('f_answer').value };
+  } else if (type === 'resources') {
+    body = { title: document.getElementById('f_title').value, description: document.getElementById('f_description').value, url: document.getElementById('f_url').value };
+  }
+  const r = await fetch(`/admin/api/${type}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const d = await r.json();
+  const msg = document.getElementById('addItemMsg');
+  if (d.ok) {
+    msg.textContent = '✓ Added! Reloading...';
+    msg.style.display = 'block';
+    setTimeout(() => location.reload(), 800);
+  } else {
+    msg.textContent = d.error || 'Could not add item.';
+    msg.style.color = '#c00';
+    msg.style.display = 'block';
+  }
+}
+
+async function deleteItem(type, id, btn) {
+  if (!confirm('Delete this item?')) return;
+  const r = await fetch(`/admin/api/${type}/${id}/delete`, { method:'POST' });
+  const d = await r.json();
+  if (d.ok) btn.closest('.item-row').remove();
+  else alert('Could not delete. Please try again.');
+}
+</script>
+</body>
+</html>

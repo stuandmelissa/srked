@@ -387,3 +387,45 @@ input[type="file"] {
   font-size: 0.9rem;
   margin-bottom: 1.25rem;
 }
+
+/* ── Admin header restyle ─────────────────────────────────────────────────── */
+.admin-header-inner { display:flex; align-items:center; justify-content:space-between; padding:0 1rem; height:56px; }
+.admin-brand { display:flex; align-items:center; gap:0.6rem; color:#fff; font-weight:700; font-size:1rem; }
+.admin-main { padding:1.25rem; max-width:900px; margin:0 auto; }
+
+/* ── Services manager ─────────────────────────────────────────────────────── */
+.service-item { display:flex; gap:0.75rem; align-items:flex-start; padding:1rem; border:1px solid #dde3ea; border-radius:8px; margin-bottom:0.75rem; }
+.service-item-icon input { width:60px; text-align:center; font-size:1.3rem; padding:0.4rem; border:1px solid #dde3ea; border-radius:6px; }
+.service-item-fields { flex:1; display:flex; flex-direction:column; gap:0.5rem; }
+.service-item-actions { display:flex; flex-direction:column; gap:0.4rem; }
+.add-service-row { display:flex; gap:0.75rem; align-items:center; }
+.btn-danger { background:#e74c3c; color:#fff; border:none; border-radius:5px; cursor:pointer; padding:0.4rem 0.9rem; font-size:0.85rem; }
+.btn-danger:hover { background:#c0392b; }
+.btn-gold { background:var(--gold); color:var(--blue); border:none; border-radius:5px; cursor:pointer; font-weight:600; }
+.btn-gold:hover { background:var(--gold-dark,#c99b30); }
+
+/* ── Pages manager ────────────────────────────────────────────────────────── */
+.pages-table { width:100%; border-collapse:collapse; font-size:0.95rem; }
+.pages-table th { background:var(--blue); color:#fff; padding:0.6rem 0.8rem; text-align:left; font-weight:600; }
+.pages-table td { padding:0.65rem 0.8rem; border-bottom:1px solid #eee; vertical-align:middle; }
+.page-type-badge { background:#eef0f5; color:#555; font-size:0.75rem; padding:0.15rem 0.5rem; border-radius:4px; margin-left:0.5rem; }
+.builtin-badge { background:#d4edda; color:#155724; font-size:0.72rem; padding:0.15rem 0.5rem; border-radius:4px; margin-left:0.4rem; }
+.toggle-btn { border:none; border-radius:20px; padding:0.3rem 0.8rem; font-size:0.82rem; cursor:pointer; font-weight:600; }
+.toggle-btn.on { background:#d4edda; color:#155724; }
+.toggle-btn.off { background:#f8d7da; color:#721c24; }
+.page-templates { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:1rem; margin-top:1rem; }
+.page-template-card { border:2px solid #dde3ea; border-radius:10px; padding:1.25rem 1rem; text-align:center; cursor:pointer; transition:all 0.2s; }
+.page-template-card:hover { border-color:var(--gold); background:#fffdf5; transform:translateY(-2px); }
+.pt-icon { font-size:2rem; margin-bottom:0.5rem; }
+.page-template-card h4 { color:var(--blue); margin-bottom:0.3rem; font-size:1rem; }
+.page-template-card p { color:#777; font-size:0.82rem; }
+
+/* ── Page items (testimonials / faq / resources) ──────────────────────────── */
+.item-row { display:flex; gap:1rem; align-items:flex-start; padding:1rem; border:1px solid #dde3ea; border-radius:8px; margin-bottom:0.75rem; }
+.item-row-content { flex:1; }
+
+/* ── Social links ─────────────────────────────────────────────────────────── */
+.social-row { display:flex; align-items:center; gap:0.75rem; padding:0.6rem 0; border-bottom:1px solid #eee; flex-wrap:wrap; }
+.social-label { min-width:110px; font-size:0.9rem; }
+.social-url { flex:1; min-width:180px; }
+.social-toggle-label { display:flex; align-items:center; gap:0.4rem; font-size:0.9rem; white-space:nowrap; cursor:pointer; }

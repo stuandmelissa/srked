@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services — Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+<header class="admin-header">
+  <div class="admin-header-inner">
+    <a href="/admin" class="admin-brand">
+      <%- include('../partials/butterfly', { bfClass: 'nav-butterfly' }) %>
+      <span>SRK Admin</span>
+    </a>
+    <a href="/admin/logout" class="admin-logout">Log out</a>
+  </div>
+  <nav class="admin-tabs" aria-label="Admin navigation">
+    <% navPages.forEach(p => { %>
+      <a href="/admin/page/<%= p.slug %>" class="admin-tab"><%= p.nav_label %></a>
+    <% }) %>
+    <a href="/admin/services" class="admin-tab active">⚙ Services</a>
+    <a href="/admin/pages" class="admin-tab">⚙ Pages</a>
+    <a href="/admin/messages" class="admin-tab">Messages<% if (unreadCount > 0) { %> <span class="badge"><%= unreadCount %></span><% } %></a>
+    <a href="/admin/settings" class="admin-tab">Settings</a>
+  </nav>
+</header>
+
+<main class="admin-main">
+  <div class="content-card">
+    <h2 style="margin-bottom:1.5rem;color:var(--blue);">My Services</h2>
+    <p style="margin-bottom:1.5rem;color:#666;">Add, edit, or remove the services shown on your website. Drag to reorder (coming soon).</p>
+
+    <div id="servicesList">
+      <% services.forEach(s => { %>
+        <div class="service-item" data-id="<%= s.id %>">
+          <div class="service-item-icon"><input type="text" class="svc-icon" value="<%= s.icon %>" maxlength="5" placeholder="emoji"></div>
+          <div class="service-item-fields">
+            <input type="text" class="svc-title" value="<%= s.title %>" placeholder="Service title" maxlength="200">
+            <textarea class="svc-desc" rows="2" placeholder="Description" maxlength="1000"><%= s.description %></textarea>
+          </div>
+          <div class="service-item-actions">
+            <button class="btn-save-svc btn-sm btn-gold" onclick="saveService(<%= s.id %>, this)">Save</button>
+            <button class="btn-del-svc btn-sm btn-danger" onclick="deleteService(<%= s.id %>, this)">Delete</button>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="add-item-form" style="margin-top:2rem;">
+      <h3 style="margin-bottom:1rem;font-size:1rem;">Add a New Service</h3>
+      <div class="add-service-row">
+        <input type="text" id="newIcon" placeholder="Icon (emoji)" value="✏️" maxlength="5" style="width:70px;">
+        <input type="text" id="newTitle" placeholder="Service title" maxlength="200" style="flex:1;">
+      </div>
+      <textarea id="newDesc" rows="2" placeholder="Brief description of this service..." maxlength="1000" style="width:100%;margin-top:0.5rem;"></textarea>
+      <button class="btn btn-gold" style="margin-top:0.75rem;" onclick="addService()">+ Add Service</button>
+      <p id="addMsg" style="margin-top:0.5rem;color:var(--green);display:none;">✓ Service added!</p>
+    </div>
+  </div>
+</main>
+
+<script>
+async function saveService(id, btn) {
+  const row = btn.closest('.service-item');
+  const title = row.querySelector('.svc-title').value;
+  const description = row.querySelector('.svc-desc').value;
+  const icon = row.querySelector('.svc-icon').value;
+  const r = await fetch(`/admin/api/services/${id}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({title, description, icon}) });
+  const d = await r.json();
+  btn.textContent = d.ok ? '✓ Saved' : 'Error';
+  setTimeout(() => btn.textContent = 'Save', 2000);
+}
+
+async function deleteService(id, btn) {
+  if (!confirm('Delete this service? It will be removed from the website.')) return;
+  const r = await fetch(`/admin/api/services/${id}/delete`, { method:'POST' });
+  const d = await r.json();
+  if (d.ok) btn.closest('.service-item').remove();
+  else alert('Could not delete. Please try again.');
+}
+
+async function addService() {
+  const icon = document.getElementById('newIcon').value.trim() || '✏️';
+  const title = document.getElementById('newTitle').value.trim();
+  const description = document.getElementById('newDesc').value.trim();
+  if (!title) { alert('Please enter a title for the service.'); return; }
+  const r = await fetch('/admin/api/services', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({title, description, icon}) });
+  const d = await r.json();
+  if (d.ok) {
+    document.getElementById('addMsg').style.display = 'block';
+    setTimeout(() => location.reload(), 800);
+  } else alert(d.error || 'Could not add service.');
+}
+</script>
+</body>
+</html>

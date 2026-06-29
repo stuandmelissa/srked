@@ -527,3 +527,35 @@ h1, h2, h3, h4 {
   margin-left: auto;
   margin-right: auto;
 }
+
+/* ── Social links ─────────────────────────────────────────────────────────── */
+.social-links { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; }
+.social-link { display:inline-block; padding:0.3rem 0.75rem; background:rgba(255,255,255,0.12); color:#fff; border-radius:4px; font-size:0.8rem; text-decoration:none; transition:background 0.2s; }
+.social-link:hover { background:rgba(255,255,255,0.22); }
+
+/* ── Testimonials ─────────────────────────────────────────────────────────── */
+.testimonials-grid { display:grid; gap:1.5rem; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); }
+.testimonial-card { background:#fff; border:1px solid #e8ecf0; border-radius:10px; padding:1.75rem; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+.testimonial-quote { font-size:1.05rem; font-style:italic; color:#333; line-height:1.65; margin-bottom:1rem; }
+.testimonial-name { color:var(--blue); font-weight:600; font-size:0.95rem; }
+
+/* ── FAQ ──────────────────────────────────────────────────────────────────── */
+.faq-list { max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:0.75rem; }
+.faq-item { border:1px solid #dde3ea; border-radius:8px; overflow:hidden; }
+.faq-question { padding:1.1rem 1.25rem; font-weight:600; color:var(--blue); cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; }
+.faq-question::after { content:'＋'; font-size:1.1rem; color:var(--gold); }
+details[open] .faq-question::after { content:'－'; }
+.faq-answer { padding:0 1.25rem 1.1rem; color:#555; line-height:1.7; }
+
+/* ── Resources ────────────────────────────────────────────────────────────── */
+.resources-list { display:flex; flex-direction:column; gap:1rem; max-width:760px; margin:0 auto; }
+.resource-card { display:flex; align-items:center; justify-content:space-between; gap:1rem; background:#fff; border:1px solid #e8ecf0; border-radius:8px; padding:1.25rem 1.5rem; }
+.resource-info h3 { color:var(--blue); font-size:1rem; margin-bottom:0.25rem; }
+.resource-info p { color:#666; font-size:0.9rem; }
+.btn-sm { padding:0.35rem 0.85rem; font-size:0.85rem; border-radius:5px; }
+
+/* ── Pricing ──────────────────────────────────────────────────────────────── */
+.pricing-grid { display:grid; gap:1.5rem; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); }
+.pricing-card { background:#fff; border:2px solid var(--blue); border-radius:10px; padding:2rem 1.5rem; text-align:center; }
+.pricing-card h3 { color:var(--blue); margin-bottom:0.75rem; }
+.pricing-price { font-size:1.4rem; font-weight:700; color:var(--gold); margin-bottom:1rem; }

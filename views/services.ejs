@@ -10,31 +10,13 @@
 <section class="section">
   <div class="container">
     <div class="services-page-grid">
-
-      <div class="service-detail-card">
-        <div class="service-icon">🗺️</div>
-        <h3><%= content.service_1_title %></h3>
-        <p><%= content.service_1_text %></p>
-      </div>
-
-      <div class="service-detail-card">
-        <div class="service-icon">📝</div>
-        <h3><%= content.service_2_title %></h3>
-        <p><%= content.service_2_text %></p>
-      </div>
-
-      <div class="service-detail-card">
-        <div class="service-icon">🎓</div>
-        <h3><%= content.service_3_title %></h3>
-        <p><%= content.service_3_text %></p>
-      </div>
-
-      <div class="service-detail-card">
-        <div class="service-icon">💡</div>
-        <h3><%= content.service_4_title %></h3>
-        <p><%= content.service_4_text %></p>
-      </div>
-
+      <% services.forEach(s => { %>
+        <div class="service-detail-card">
+          <div class="service-icon"><%= s.icon %></div>
+          <h3><%= s.title %></h3>
+          <p><%= s.description %></p>
+        </div>
+      <% }) %>
     </div>
   </div>
 </section>

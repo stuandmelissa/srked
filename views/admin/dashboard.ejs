@@ -4,49 +4,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — SRK Consulting</title>
+  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/admin.css">
 </head>
-<body>
+<body class="admin-body">
 
 <header class="admin-header">
-  <h1>SRK <span>Admin</span></h1>
-  <a href="/admin/logout" class="admin-logout">Log Out</a>
+  <div class="admin-header-inner">
+    <a href="/admin" class="admin-brand">
+      <%- include('../partials/butterfly', { bfClass: 'nav-butterfly' }) %>
+      <span>SRK Admin</span>
+    </a>
+    <a href="/admin/logout" class="admin-logout">Log out</a>
+  </div>
+  <nav class="admin-tabs" aria-label="Admin navigation">
+    <% navPages.forEach(p => { %>
+      <a href="/admin/page/<%= p.slug %>" class="admin-tab <%= pageName === p.slug ? 'active' : '' %>"><%= p.nav_label %></a>
+    <% }) %>
+    <a href="/admin/services" class="admin-tab">⚙ Services</a>
+    <a href="/admin/pages" class="admin-tab">⚙ Pages</a>
+    <a href="/admin/messages" class="admin-tab">Messages<% if (unreadCount > 0) { %> <span class="badge"><%= unreadCount %></span><% } %></a>
+    <a href="/admin/settings" class="admin-tab <%= pageName === 'settings' ? 'active' : '' %>">Settings</a>
+  </nav>
 </header>
 
-<nav class="admin-tabs" role="navigation" aria-label="Admin navigation">
-  <% pages.forEach(p => { %>
-    <a href="/admin/page/<%= p %>" class="admin-tab <%= pageName === p ? 'active' : '' %>">
-      <%= p.charAt(0).toUpperCase() + p.slice(1) %>
-    </a>
-  <% }) %>
-  <a href="/admin/messages" class="admin-tab">
-    Messages
-    <% if (unreadCount > 0) { %><span class="badge"><%= unreadCount %></span><% } %>
-  </a>
-  <a href="/admin/settings" class="admin-tab <%= pageName === 'settings' ? 'active' : '' %>">⚙️ Settings</a>
-</nav>
-
-<main class="admin-body">
+<main class="admin-main">
+  <% if (pageName !== 'settings') { %>
   <div class="admin-intro">
-    Editing the <strong><%= pageName.charAt(0).toUpperCase() + pageName.slice(1) %></strong> page.
-    Change any text below and tap <strong>Save</strong>. Your changes appear on the website immediately.
+    Editing the <strong><%= page ? page.title : pageName %></strong> page.
+    Change any text and tap <strong>Save</strong>. Changes go live immediately.
   </div>
+  <% } %>
 
   <% if (pageName === 'about') { %>
-  <!-- Photo upload section -->
-  <div class="photo-upload-section">
+  <div class="content-card">
     <label class="upload-label">Your Photo</label>
     <img src="/images/photo.jpg" alt="Your photo" class="photo-preview" id="photoPreview">
     <form id="photoForm" enctype="multipart/form-data">
       <input type="file" name="photo" id="photoInput" accept="image/*" capture="user">
       <button type="submit" class="upload-btn">Upload New Photo</button>
     </form>
-    <p id="photoStatus" style="font-size:0.85rem;color:#3A7D44;margin-top:0.5rem;display:none;">Photo updated!</p>
+    <p id="photoStatus" style="font-size:0.85rem;color:var(--green);margin-top:0.5rem;display:none;">Photo updated!</p>
   </div>
   <% } %>
 
   <% fields.forEach(field => { %>
-  <div class="content-card" data-page="<%= pageName %>" data-key="<%= field.section_key %>">
+  <div class="content-card">
     <label for="field-<%= field.section_key %>"><%= field.label %></label>
     <% if (field.content_type === 'textarea') { %>
       <textarea id="field-<%= field.section_key %>" rows="4"><%= field.value || '' %></textarea>
@@ -61,48 +64,92 @@
   <% }) %>
 
   <% if (pageName === 'settings') { %>
+
+  <!-- Social Media -->
+  <div class="content-card">
+    <h3 style="margin-bottom:0.5rem;color:var(--blue);">Social Media</h3>
+    <p style="margin-bottom:1.25rem;color:#666;font-size:0.9rem;">
+      Enter your profile URLs and turn each one on to show it in your website footer. Leave a link off if you don't use that platform.
+    </p>
+    <div id="socialForm">
+      <% if (typeof socialLinks !== 'undefined') { socialLinks.forEach(s => { %>
+      <div class="social-row">
+        <label class="social-label"><strong><%= s.label %></strong></label>
+        <input type="url" class="social-url" data-platform="<%= s.platform %>" value="<%= s.url || '' %>" placeholder="https://...">
+        <label class="social-toggle-label">
+          <input type="checkbox" class="social-enabled" data-platform="<%= s.platform %>" <%= s.is_enabled ? 'checked' : '' %>>
+          Show
+        </label>
+      </div>
+      <% }) } %>
+    </div>
+    <div class="content-card-footer">
+      <span class="save-hint" id="hint-social"></span>
+      <button class="save-btn" onclick="saveSocial(this)">Save Social Links</button>
+    </div>
+  </div>
+
+  <!-- Change Password -->
   <div class="content-card">
     <label>Change Password</label>
-    <div id="passwordForm">
-      <input type="password" id="currentPass" placeholder="Current password" style="margin-bottom:0.75rem;">
-      <input type="password" id="newPass" placeholder="New password (min 8 chars)" style="margin-bottom:0.75rem;">
-      <input type="password" id="confirmPass" placeholder="Confirm new password">
-    </div>
+    <input type="password" id="currentPass" placeholder="Current password" style="margin-bottom:0.75rem;">
+    <input type="password" id="newPass" placeholder="New password (min 8 chars)" style="margin-bottom:0.75rem;">
+    <input type="password" id="confirmPass" placeholder="Confirm new password">
     <div class="content-card-footer">
       <span class="save-hint" id="hint-password"></span>
       <button class="save-btn" onclick="changePassword(this)">Update Password</button>
     </div>
   </div>
+
   <% } %>
 </main>
 
 <script>
 async function saveField(page, key, btn) {
   const card = btn.closest('.content-card');
-  const input = card.querySelector('input, textarea');
+  const input = card.querySelector('input[type="text"], textarea');
   const hint = document.getElementById('hint-' + key);
-  btn.textContent = 'Saving…';
-  btn.disabled = true;
+  btn.textContent = 'Saving…'; btn.disabled = true;
   try {
     const res = await fetch('/admin/api/content', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ page, section_key: key, value: input.value })
     });
     const data = await res.json();
     if (data.ok) {
-      btn.textContent = 'Saved ✓';
-      btn.classList.add('saved');
+      btn.textContent = 'Saved ✓'; btn.classList.add('saved');
       hint.textContent = '';
       setTimeout(() => { btn.textContent = 'Save'; btn.classList.remove('saved'); btn.disabled = false; }, 2000);
-    } else {
-      throw new Error();
-    }
+    } else throw new Error();
   } catch {
-    btn.textContent = 'Save';
-    btn.disabled = false;
-    hint.textContent = 'Save failed. Try again.';
-    hint.style.color = '#c0392b';
+    btn.textContent = 'Save'; btn.disabled = false;
+    hint.textContent = 'Save failed. Try again.'; hint.style.color = '#c0392b';
+  }
+}
+
+async function saveSocial(btn) {
+  const rows = document.querySelectorAll('.social-row');
+  const links = Array.from(rows).map(row => ({
+    platform: row.querySelector('.social-url').dataset.platform,
+    url: row.querySelector('.social-url').value.trim(),
+    is_enabled: row.querySelector('.social-enabled').checked
+  }));
+  const hint = document.getElementById('hint-social');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+  try {
+    const res = await fetch('/admin/api/social', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ links })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      btn.textContent = 'Saved ✓'; btn.classList.add('saved');
+      hint.textContent = ''; hint.style.color = 'var(--green)';
+      setTimeout(() => { btn.textContent = 'Save Social Links'; btn.classList.remove('saved'); btn.disabled = false; }, 2000);
+    } else throw new Error();
+  } catch {
+    btn.textContent = 'Save Social Links'; btn.disabled = false;
+    hint.textContent = 'Save failed. Try again.'; hint.style.color = '#c0392b';
   }
 }
 
@@ -111,34 +158,23 @@ async function changePassword(btn) {
   const newpass = document.getElementById('newPass').value;
   const confirm = document.getElementById('confirmPass').value;
   const hint = document.getElementById('hint-password');
-  btn.textContent = 'Saving…';
-  btn.disabled = true;
+  btn.textContent = 'Saving…'; btn.disabled = true;
   try {
     const res = await fetch('/admin/api/password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ current, newpass, confirm })
     });
     const data = await res.json();
     if (data.ok) {
-      btn.textContent = 'Updated ✓';
-      btn.classList.add('saved');
-      hint.style.color = '#3A7D44';
-      hint.textContent = 'Password updated!';
-      document.getElementById('currentPass').value = '';
-      document.getElementById('newPass').value = '';
-      document.getElementById('confirmPass').value = '';
+      btn.textContent = 'Updated ✓'; btn.classList.add('saved');
+      hint.style.color = 'var(--green)'; hint.textContent = 'Password updated!';
+      ['currentPass','newPass','confirmPass'].forEach(id => document.getElementById(id).value = '');
       setTimeout(() => { btn.textContent = 'Update Password'; btn.classList.remove('saved'); btn.disabled = false; }, 2500);
     } else {
-      hint.textContent = data.error || 'Failed. Try again.';
-      hint.style.color = '#c0392b';
-      btn.textContent = 'Update Password';
-      btn.disabled = false;
+      hint.textContent = data.error || 'Failed. Try again.'; hint.style.color = '#c0392b';
+      btn.textContent = 'Update Password'; btn.disabled = false;
     }
-  } catch {
-    btn.textContent = 'Update Password';
-    btn.disabled = false;
-  }
+  } catch { btn.textContent = 'Update Password'; btn.disabled = false; }
 }
 
 <% if (pageName === 'about') { %>
@@ -146,21 +182,15 @@ document.getElementById('photoForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const file = document.getElementById('photoInput').files[0];
   if (!file) return;
-  const form = new FormData();
-  form.append('photo', file);
-  const status = document.getElementById('photoStatus');
-  status.style.display = 'none';
+  const form = new FormData(); form.append('photo', file);
+  const status = document.getElementById('photoStatus'); status.style.display = 'none';
   try {
     const res = await fetch('/admin/api/photo', { method: 'POST', body: form });
     const data = await res.json();
-    if (data.ok) {
-      document.getElementById('photoPreview').src = data.path;
-      status.style.display = 'block';
-    }
+    if (data.ok) { document.getElementById('photoPreview').src = data.path; status.style.display = 'block'; }
   } catch { alert('Photo upload failed. Please try again.'); }
 });
 <% } %>
 </script>
-
 </body>
 </html>

@@ -1,0 +1,35 @@
+<%- include('partials/header', { title, page, navPages, socialLinks }) %>
+
+<div class="page-banner">
+  <div class="container">
+    <h1><%= content.page_title %></h1>
+    <% if (content.intro_text) { %><p><%= content.intro_text %></p><% } %>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="pricing-grid">
+      <% ['rate_1','rate_2','rate_3'].forEach(key => { %>
+        <% if (content[key + '_title']) { %>
+          <div class="pricing-card">
+            <h3><%= content[key + '_title'] %></h3>
+            <p class="pricing-price"><%= content[key + '_price'] %></p>
+            <p><%= content[key + '_desc'] %></p>
+            <a href="/contact" class="btn btn-gold btn-sm">Get Started</a>
+          </div>
+        <% } %>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="cta-banner">
+  <div class="container">
+    <h2>Questions About Pricing?</h2>
+    <p>Every family's situation is unique. Let's talk about what makes sense for you.</p>
+    <a href="/contact" class="btn btn-outline">Reach Out</a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

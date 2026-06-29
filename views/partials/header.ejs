@@ -16,10 +16,9 @@
   </a>
 
   <ul class="nav-links" role="list">
-    <li><a href="/" class="<%= page === 'home' ? 'active' : '' %>">Home</a></li>
-    <li><a href="/about" class="<%= page === 'about' ? 'active' : '' %>">About</a></li>
-    <li><a href="/services" class="<%= page === 'services' ? 'active' : '' %>">Services</a></li>
-    <li><a href="/contact" class="<%= page === 'contact' ? 'active' : '' %>">Contact</a></li>
+    <% navPages.forEach(p => { %>
+      <li><a href="<%= p.page_type === 'home' ? '/' : '/' + p.slug %>" class="<%= page === p.slug ? 'active' : '' %>"><%= p.nav_label %></a></li>
+    <% }) %>
   </ul>
 
   <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
@@ -29,10 +28,9 @@
 
 <div class="nav-mobile" id="navMobile" aria-hidden="true">
   <ul role="list">
-    <li><a href="/">Home</a></li>
-    <li><a href="/about">About</a></li>
-    <li><a href="/services">Services</a></li>
-    <li><a href="/contact">Contact</a></li>
+    <% navPages.forEach(p => { %>
+      <li><a href="<%= p.page_type === 'home' ? '/' : '/' + p.slug %>"><%= p.nav_label %></a></li>
+    <% }) %>
   </ul>
 </div>
 

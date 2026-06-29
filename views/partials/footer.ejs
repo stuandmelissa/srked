@@ -8,14 +8,20 @@
         <span>SRK Consulting</span>
       </div>
       <p class="footer-tagline">Educational Consulting &amp; Tutoring<br>Helping every student reach their potential.</p>
+      <% if (socialLinks && socialLinks.length > 0) { %>
+        <div class="social-links">
+          <% socialLinks.forEach(s => { %>
+            <a href="<%= s.url %>" target="_blank" rel="noopener noreferrer" class="social-link social-<%= s.platform %>" aria-label="<%= s.label %>"><%= s.label %></a>
+          <% }) %>
+        </div>
+      <% } %>
     </div>
     <div>
       <h4>Navigation</h4>
       <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/services">Services</a></li>
-        <li><a href="/contact">Contact</a></li>
+        <% navPages.forEach(p => { %>
+          <li><a href="<%= p.page_type === 'home' ? '/' : '/' + p.slug %>"><%= p.nav_label %></a></li>
+        <% }) %>
       </ul>
     </div>
     <div>
