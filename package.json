@@ -5,7 +5,7 @@
   "description": "SRK Consulting - Educational Consulting & Tutoring",
   "main": "server.js",
   "scripts": {
-    "build": "echo build",
+    "build": "node db/setup.js",
     "start": "node server.js",
     "dev": "nodemon server.js",
     "setup": "node db/setup.js"

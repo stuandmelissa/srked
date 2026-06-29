@@ -42,16 +42,31 @@ const contentSeed = [
 async function setup() {
   console.log('Setting up SRK Consulting database...\n');
 
+  // On local dev, create the DB if it doesn't exist.
+  // On managed hosting (GoDaddy), the DB already exists and CREATE DATABASE
+  // may be denied — that's fine, we just connect to it directly.
+  try {
+    const tmp = await mysql.createConnection({
+      host: process.env.DB_HOST || 'localhost',
+      port: Number(process.env.DB_PORT || '3306'),
+      user: process.env.DB_USER || 'root',
+      password: process.env.DB_PASSWORD || '',
+    });
+    await tmp.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
+    await tmp.end();
+  } catch {
+    // Database already exists or insufficient privileges — proceed
+  }
+
   const conn = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT || '3306'),
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
+    database: DB_NAME,
     multipleStatements: true,
   });
 
-  await conn.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
-  await conn.query(`USE \`${DB_NAME}\``);
   console.log(`✓ Database "${DB_NAME}" ready`);
 
   await conn.query(`
