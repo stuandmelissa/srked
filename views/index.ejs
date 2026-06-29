@@ -1,0 +1,67 @@
+<%- include('partials/header', { title, page }) %>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg-butterfly" aria-hidden="true">
+    <%- include('partials/butterfly', { bfClass: 'hero-butterfly' }) %>
+  </div>
+  <div class="hero-content">
+    <h1><%= content.hero_title %></h1>
+    <p><%= content.hero_subtitle %></p>
+    <a href="/contact" class="btn btn-gold"><%= content.hero_cta %></a>
+  </div>
+</section>
+
+<!-- Intro -->
+<section class="section intro-section">
+  <div class="container">
+    <p class="section-label">Educational Consulting &amp; Tutoring</p>
+    <h2 class="section-title"><%= content.intro_title %></h2>
+    <p class="section-text"><%= content.intro_text %></p>
+    <a href="/about" class="btn btn-outline-blue mt-3" style="margin-top:1.5rem;display:inline-block;">Meet Stacy</a>
+  </div>
+</section>
+
+<!-- Services preview -->
+<section class="section section-alt">
+  <div class="container">
+    <p class="section-label">What I Offer</p>
+    <h2 class="section-title">How I Can Help</h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🗺️</div>
+        <h3><%= servicesContent.service_1_title %></h3>
+        <p><%= servicesContent.service_1_text %></p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📝</div>
+        <h3><%= servicesContent.service_2_title %></h3>
+        <p><%= servicesContent.service_2_text %></p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🎓</div>
+        <h3><%= servicesContent.service_3_title %></h3>
+        <p><%= servicesContent.service_3_text %></p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">💡</div>
+        <h3><%= servicesContent.service_4_title %></h3>
+        <p><%= servicesContent.service_4_text %></p>
+      </div>
+    </div>
+    <div class="text-center" style="margin-top:2.5rem;">
+      <a href="/services" class="btn btn-gold">See All Services</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Banner -->
+<section class="cta-banner">
+  <div class="container">
+    <h2>Ready to Get Started?</h2>
+    <p>Every student's journey is unique. Let's find the right path together.</p>
+    <a href="/contact" class="btn btn-outline">Contact Me Today</a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

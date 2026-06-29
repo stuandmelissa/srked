@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages — SRK Consulting Admin</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+<header class="admin-header">
+  <h1>SRK <span>Admin</span></h1>
+  <a href="/admin/logout" class="admin-logout">Log Out</a>
+</header>
+
+<nav class="admin-tabs" role="navigation" aria-label="Admin navigation">
+  <% pages.forEach(p => { %>
+    <a href="/admin/page/<%= p %>" class="admin-tab">
+      <%= p.charAt(0).toUpperCase() + p.slice(1) %>
+    </a>
+  <% }) %>
+  <a href="/admin/messages" class="admin-tab active">
+    Messages
+    <% if (unreadCount > 0) { %><span class="badge"><%= unreadCount %></span><% } %>
+  </a>
+  <a href="/admin/settings" class="admin-tab">⚙️ Settings</a>
+</nav>
+
+<main class="admin-body">
+  <div class="admin-intro">
+    <strong><%= contacts.length %></strong> message<%= contacts.length !== 1 ? 's' : '' %> total.
+    <% if (unreadCount > 0) { %><strong style="color:#dc3545;"><%= unreadCount %> unread.</strong><% } else { %>All caught up!<% } %>
+  </div>
+
+  <% if (contacts.length === 0) { %>
+    <div class="empty-state">
+      <div class="icon">✉️</div>
+      <p>No messages yet. When someone fills out the contact form, they'll show up here.</p>
+    </div>
+  <% } else { %>
+    <% contacts.forEach(c => { %>
+    <div class="message-card <%= c.is_read ? '' : 'unread' %>" id="msg-<%= c.id %>">
+      <div class="message-header">
+        <div>
+          <span class="message-name"><%= c.name %></span>
+          <% if (!c.is_read) { %> <span class="unread-badge">New</span><% } %>
+        </div>
+        <span class="message-date">
+          <%= new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+        </span>
+      </div>
+      <p class="message-email">✉️ <a href="mailto:<%= c.email %>"><%= c.email %></a></p>
+      <% if (c.phone) { %>
+        <p class="message-phone">📞 <a href="tel:<%= c.phone %>"><%= c.phone %></a></p>
+      <% } %>
+      <div class="message-body"><%= c.message %></div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.75rem;">
+        <% if (!c.is_read) { %>
+          <button class="mark-read-btn" onclick="markRead(<%= c.id %>, this)">Mark as Read</button>
+        <% } %>
+        <a href="mailto:<%= c.email %>?subject=Re: Your message to SRK Consulting" class="mark-read-btn" style="text-align:center;">Reply by Email</a>
+        <button class="mark-read-btn" style="color:#c0392b;border-color:#f5c6cb;" onclick="deleteMsg(<%= c.id %>, this)">Delete</button>
+      </div>
+    </div>
+    <% }) %>
+  <% } %>
+</main>
+
+<script>
+async function markRead(id, btn) {
+  await fetch(`/admin/api/messages/${id}/read`, { method: 'POST' });
+  const card = document.getElementById('msg-' + id);
+  card.classList.remove('unread');
+  btn.remove();
+  const badge = card.querySelector('.unread-badge');
+  if (badge) badge.remove();
+}
+
+async function deleteMsg(id, btn) {
+  if (!confirm('Delete this message? This cannot be undone.')) return;
+  await fetch(`/admin/api/messages/${id}/delete`, { method: 'POST' });
+  document.getElementById('msg-' + id).remove();
+}
+</script>
+
+</body>
+</html>

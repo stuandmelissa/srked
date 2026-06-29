@@ -1,0 +1,50 @@
+<%- include('partials/header', { title, page }) %>
+
+<div class="page-banner">
+  <div class="container">
+    <h1><%= content.page_title %></h1>
+    <% if (content.intro_text) { %><p><%= content.intro_text %></p><% } %>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="services-page-grid">
+
+      <div class="service-detail-card">
+        <div class="service-icon">🗺️</div>
+        <h3><%= content.service_1_title %></h3>
+        <p><%= content.service_1_text %></p>
+      </div>
+
+      <div class="service-detail-card">
+        <div class="service-icon">📝</div>
+        <h3><%= content.service_2_title %></h3>
+        <p><%= content.service_2_text %></p>
+      </div>
+
+      <div class="service-detail-card">
+        <div class="service-icon">🎓</div>
+        <h3><%= content.service_3_title %></h3>
+        <p><%= content.service_3_text %></p>
+      </div>
+
+      <div class="service-detail-card">
+        <div class="service-icon">💡</div>
+        <h3><%= content.service_4_title %></h3>
+        <p><%= content.service_4_text %></p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="cta-banner">
+  <div class="container">
+    <h2>Not Sure Where to Start?</h2>
+    <p>Reach out and we'll figure out what's right for your student together.</p>
+    <a href="/contact" class="btn btn-outline">Schedule a Free Consultation</a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

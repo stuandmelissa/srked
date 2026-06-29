@@ -1,0 +1,44 @@
+<%- include('partials/header', { title, page }) %>
+
+<div class="page-banner">
+  <div class="container">
+    <h1><%= content.page_title %></h1>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <img src="/images/photo.jpg" alt="Stacy — SRK Consulting" class="about-photo">
+      </div>
+      <div class="about-bio">
+        <p class="section-label">Educational Consultant &amp; Tutor</p>
+        <h2><%= content.bio_heading %></h2>
+        <% content.bio_text.split('\n\n').filter(p => p.trim()).forEach(para => { %>
+          <p><%= para %></p>
+        <% }) %>
+
+        <div class="credentials">
+          <h3><%= content.credentials_heading %></h3>
+          <ul>
+            <% content.credentials_text.split('\n').filter(l => l.trim()).forEach(line => { %>
+              <li><%= line.replace(/^[•\-\*]\s*/, '') %></li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-banner">
+  <div class="container">
+    <h2>Let's Work Together</h2>
+    <p>I'd love to hear about your student and how I can help.</p>
+    <a href="/contact" class="btn btn-outline">Get in Touch</a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

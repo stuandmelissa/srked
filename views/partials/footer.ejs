@@ -1,0 +1,51 @@
+</div><!-- /.page-content -->
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">
+        <%- include('butterfly', { bfClass: 'footer-butterfly' }) %>
+        <span>SRK Consulting</span>
+      </div>
+      <p class="footer-tagline">Educational Consulting &amp; Tutoring<br>Helping every student reach their potential.</p>
+    </div>
+    <div>
+      <h4>Navigation</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/services">Services</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:info@srked.com">info@srked.com</a></li>
+        <li><a href="/contact">Send a Message</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; <%= new Date().getFullYear() %> SRK Consulting. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  const toggle = document.getElementById('navToggle');
+  const menu = document.getElementById('navMobile');
+  toggle.addEventListener('click', () => {
+    const open = menu.classList.toggle('open');
+    toggle.classList.toggle('active', open);
+    toggle.setAttribute('aria-expanded', open);
+    menu.setAttribute('aria-hidden', !open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    menu.classList.remove('open');
+    toggle.classList.remove('active');
+    document.body.style.overflow = '';
+  }));
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — SRK Consulting</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+<header class="admin-header">
+  <h1>SRK <span>Admin</span></h1>
+  <a href="/admin/logout" class="admin-logout">Log Out</a>
+</header>
+
+<nav class="admin-tabs" role="navigation" aria-label="Admin navigation">
+  <% pages.forEach(p => { %>
+    <a href="/admin/page/<%= p %>" class="admin-tab <%= pageName === p ? 'active' : '' %>">
+      <%= p.charAt(0).toUpperCase() + p.slice(1) %>
+    </a>
+  <% }) %>
+  <a href="/admin/messages" class="admin-tab">
+    Messages
+    <% if (unreadCount > 0) { %><span class="badge"><%= unreadCount %></span><% } %>
+  </a>
+  <a href="/admin/settings" class="admin-tab <%= pageName === 'settings' ? 'active' : '' %>">⚙️ Settings</a>
+</nav>
+
+<main class="admin-body">
+  <div class="admin-intro">
+    Editing the <strong><%= pageName.charAt(0).toUpperCase() + pageName.slice(1) %></strong> page.
+    Change any text below and tap <strong>Save</strong>. Your changes appear on the website immediately.
+  </div>
+
+  <% if (pageName === 'about') { %>
+  <!-- Photo upload section -->
+  <div class="photo-upload-section">
+    <label class="upload-label">Your Photo</label>
+    <img src="/images/photo.jpg" alt="Your photo" class="photo-preview" id="photoPreview">
+    <form id="photoForm" enctype="multipart/form-data">
+      <input type="file" name="photo" id="photoInput" accept="image/*" capture="user">
+      <button type="submit" class="upload-btn">Upload New Photo</button>
+    </form>
+    <p id="photoStatus" style="font-size:0.85rem;color:#3A7D44;margin-top:0.5rem;display:none;">Photo updated!</p>
+  </div>
+  <% } %>
+
+  <% fields.forEach(field => { %>
+  <div class="content-card" data-page="<%= pageName %>" data-key="<%= field.section_key %>">
+    <label for="field-<%= field.section_key %>"><%= field.label %></label>
+    <% if (field.content_type === 'textarea') { %>
+      <textarea id="field-<%= field.section_key %>" rows="4"><%= field.value || '' %></textarea>
+    <% } else { %>
+      <input type="text" id="field-<%= field.section_key %>" value="<%= field.value || '' %>">
+    <% } %>
+    <div class="content-card-footer">
+      <span class="save-hint" id="hint-<%= field.section_key %>"></span>
+      <button class="save-btn" onclick="saveField('<%= pageName %>', '<%= field.section_key %>', this)">Save</button>
+    </div>
+  </div>
+  <% }) %>
+
+  <% if (pageName === 'settings') { %>
+  <div class="content-card">
+    <label>Change Password</label>
+    <div id="passwordForm">
+      <input type="password" id="currentPass" placeholder="Current password" style="margin-bottom:0.75rem;">
+      <input type="password" id="newPass" placeholder="New password (min 8 chars)" style="margin-bottom:0.75rem;">
+      <input type="password" id="confirmPass" placeholder="Confirm new password">
+    </div>
+    <div class="content-card-footer">
+      <span class="save-hint" id="hint-password"></span>
+      <button class="save-btn" onclick="changePassword(this)">Update Password</button>
+    </div>
+  </div>
+  <% } %>
+</main>
+
+<script>
+async function saveField(page, key, btn) {
+  const card = btn.closest('.content-card');
+  const input = card.querySelector('input, textarea');
+  const hint = document.getElementById('hint-' + key);
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/admin/api/content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page, section_key: key, value: input.value })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      btn.textContent = 'Saved ✓';
+      btn.classList.add('saved');
+      hint.textContent = '';
+      setTimeout(() => { btn.textContent = 'Save'; btn.classList.remove('saved'); btn.disabled = false; }, 2000);
+    } else {
+      throw new Error();
+    }
+  } catch {
+    btn.textContent = 'Save';
+    btn.disabled = false;
+    hint.textContent = 'Save failed. Try again.';
+    hint.style.color = '#c0392b';
+  }
+}
+
+async function changePassword(btn) {
+  const current = document.getElementById('currentPass').value;
+  const newpass = document.getElementById('newPass').value;
+  const confirm = document.getElementById('confirmPass').value;
+  const hint = document.getElementById('hint-password');
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/admin/api/password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ current, newpass, confirm })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      btn.textContent = 'Updated ✓';
+      btn.classList.add('saved');
+      hint.style.color = '#3A7D44';
+      hint.textContent = 'Password updated!';
+      document.getElementById('currentPass').value = '';
+      document.getElementById('newPass').value = '';
+      document.getElementById('confirmPass').value = '';
+      setTimeout(() => { btn.textContent = 'Update Password'; btn.classList.remove('saved'); btn.disabled = false; }, 2500);
+    } else {
+      hint.textContent = data.error || 'Failed. Try again.';
+      hint.style.color = '#c0392b';
+      btn.textContent = 'Update Password';
+      btn.disabled = false;
+    }
+  } catch {
+    btn.textContent = 'Update Password';
+    btn.disabled = false;
+  }
+}
+
+<% if (pageName === 'about') { %>
+document.getElementById('photoForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const file = document.getElementById('photoInput').files[0];
+  if (!file) return;
+  const form = new FormData();
+  form.append('photo', file);
+  const status = document.getElementById('photoStatus');
+  status.style.display = 'none';
+  try {
+    const res = await fetch('/admin/api/photo', { method: 'POST', body: form });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('photoPreview').src = data.path;
+      status.style.display = 'block';
+    }
+  } catch { alert('Photo upload failed. Please try again.'); }
+});
+<% } %>
+</script>
+
+</body>
+</html>
