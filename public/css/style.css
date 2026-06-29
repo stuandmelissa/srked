@@ -64,9 +64,9 @@ h1, h2, h3, h4 {
   font-size: 1.05rem;
   font-weight: bold;
 }
-.nav-butterfly  { width: 38px; height: 34px; color: var(--gold); flex-shrink: 0; }
-.footer-butterfly { width: 34px; height: 30px; color: var(--gold); flex-shrink: 0; }
-.hero-butterfly { width: 100%; height: 100%; }
+.nav-butterfly  { width: 38px; height: 38px; flex-shrink: 0; object-fit: contain; display: block; }
+.footer-butterfly { width: 34px; height: 34px; flex-shrink: 0; object-fit: contain; display: block; }
+.hero-butterfly { width: 100%; height: 100%; object-fit: contain; display: block; }
 
 .nav-links {
   display: none;
@@ -209,7 +209,7 @@ h1, h2, h3, h4 {
   transform: translate(-50%, -50%);
   width: min(460px, 90vw);
   height: min(460px, 90vw);
-  color: rgba(255,255,255,0.04);
+  opacity: 0.08;
   pointer-events: none;
 }
 .hero-content { position: relative; z-index: 1; max-width: 780px; }
