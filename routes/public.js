@@ -1,7 +1,6 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import db from '../db.js';
-import { Resend } from 'resend';
 
 const router = express.Router();
 
@@ -28,23 +27,30 @@ async function getGlobalData() {
 }
 
 async function sendContactEmail(contact) {
-  if (!process.env.RESEND_API_KEY) { console.log('Email skipped: RESEND_API_KEY not set'); return; }
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
-    from: 'SRK Consulting <noreply@updates.srked.com>',
-    to: process.env.EMAIL_TO || 'info@srked.com',
-    subject: `New message from ${contact.name} — SRK Consulting`,
-    html: `
-      <h2 style="color:#1B3A6B;">New Contact Form Submission</h2>
-      <table style="border-collapse:collapse;width:100%;max-width:500px;">
-        <tr><td style="padding:8px;font-weight:bold;">Name</td><td style="padding:8px;">${escapeHtml(contact.name)}</td></tr>
-        <tr><td style="padding:8px;font-weight:bold;">Email</td><td style="padding:8px;"><a href="mailto:${escapeHtml(contact.email)}">${escapeHtml(contact.email)}</a></td></tr>
-        <tr><td style="padding:8px;font-weight:bold;">Phone</td><td style="padding:8px;">${escapeHtml(contact.phone || 'N/A')}</td></tr>
-      </table>
-      <h3 style="color:#1B3A6B;margin-top:20px;">Message</h3>
-      <p style="white-space:pre-wrap;background:#f8f9fa;padding:15px;border-radius:6px;">${escapeHtml(contact.message)}</p>
-    `
+  if (!process.env.RESEND_API_KEY) return;
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: 'SRK Consulting <noreply@updates.srked.com>',
+      to: process.env.EMAIL_TO || 'info@srked.com',
+      subject: `New message from ${contact.name} — SRK Consulting`,
+      html: `
+        <h2 style="color:#1B3A6B;">New Contact Form Submission</h2>
+        <table style="border-collapse:collapse;width:100%;max-width:500px;">
+          <tr><td style="padding:8px;font-weight:bold;">Name</td><td style="padding:8px;">${escapeHtml(contact.name)}</td></tr>
+          <tr><td style="padding:8px;font-weight:bold;">Email</td><td style="padding:8px;"><a href="mailto:${escapeHtml(contact.email)}">${escapeHtml(contact.email)}</a></td></tr>
+          <tr><td style="padding:8px;font-weight:bold;">Phone</td><td style="padding:8px;">${escapeHtml(contact.phone || 'N/A')}</td></tr>
+        </table>
+        <h3 style="color:#1B3A6B;margin-top:20px;">Message</h3>
+        <p style="white-space:pre-wrap;background:#f8f9fa;padding:15px;border-radius:6px;">${escapeHtml(contact.message)}</p>
+      `
+    })
   });
+  if (!res.ok) throw new Error(`Resend API error: ${res.status}`);
 }
 
 // ─── Core pages ──────────────────────────────────────────────────────────────

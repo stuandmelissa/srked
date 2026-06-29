@@ -22,7 +22,6 @@
     "express-session": "^1.18.0",
     "helmet": "^8.2.0",
     "multer": "^2.2.0",
-    "mysql2": "^3.9.7",
-    "resend": "^6.16.0"
+    "mysql2": "^3.9.7"
   }
 }
