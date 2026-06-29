@@ -24,7 +24,7 @@
               <i data-lucide="<%= s.icon %>"></i>
             </button>
             <input type="hidden" class="svc-icon" value="<%= s.icon %>">
-            <div class="icon-picker-grid" hidden></div>
+            <div class="icon-picker-grid"></div>
           </div>
           <div class="service-item-fields">
             <input type="text" class="svc-title" value="<%= s.title %>" placeholder="Service title" maxlength="200">
@@ -46,7 +46,7 @@
             <i data-lucide="pencil-line"></i>
           </button>
           <input type="hidden" id="newIcon" value="pencil-line">
-          <div class="icon-picker-grid" hidden></div>
+          <div class="icon-picker-grid"></div>
         </div>
         <input type="text" id="newTitle" placeholder="Service title" maxlength="200" style="flex:1;min-width:180px;">
       </div>
@@ -75,21 +75,20 @@ function buildPickerGrid(grid) {
 function toggleIconPicker(btn) {
   const wrap = btn.closest('.svc-icon-wrap');
   const grid = wrap.querySelector('.icon-picker-grid');
-  if (!grid.hidden) { grid.hidden = true; return; }
+  if (grid.classList.contains('open')) { grid.classList.remove('open'); return; }
   if (!grid.children.length) buildPickerGrid(grid);
-  document.querySelectorAll('.icon-picker-grid').forEach(g => { if (g !== grid) g.hidden = true; });
-  grid.hidden = false;
+  document.querySelectorAll('.icon-picker-grid.open').forEach(g => g.classList.remove('open'));
+  grid.classList.add('open');
 }
 
 function selectIcon(btn) {
   const ico = btn.dataset.icon;
   const wrap = btn.closest('.svc-icon-wrap');
-  const input = wrap.querySelector('[type="hidden"]');
+  wrap.querySelector('[type="hidden"]').value = ico;
   const preview = wrap.querySelector('.icon-preview-btn');
-  input.value = ico;
   preview.innerHTML = `<i data-lucide="${ico}"></i>`;
   lucide.createIcons({ el: preview });
-  wrap.querySelector('.icon-picker-grid').hidden = true;
+  wrap.querySelector('.icon-picker-grid').classList.remove('open');
 }
 
 async function saveService(id, btn) {
@@ -126,7 +125,7 @@ async function addService() {
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.svc-icon-wrap')) {
-    document.querySelectorAll('.icon-picker-grid').forEach(g => g.hidden = true);
+    document.querySelectorAll('.icon-picker-grid.open').forEach(g => g.classList.remove('open'));
   }
 });
 </script>
