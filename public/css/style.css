@@ -465,7 +465,9 @@ h1, h2, h3, h4 {
 }
 .contact-info h3 { color: var(--gold); margin-bottom: 1.5rem; font-size: 1.2rem; }
 .contact-info-item { display: flex; gap: 0.75rem; margin-bottom: 1.25rem; align-items: flex-start; }
-.contact-info-item .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+.contact-info-item .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; display:flex; align-items:center; }
+.contact-info-item .icon svg { width: 1.1rem; height: 1.1rem; color: var(--gold); }
+.contact-butterfly { width: 1.1rem; height: 1.1rem; object-fit: contain; }
 .contact-info-item p   { color: rgba(255,255,255,0.85); font-size: 0.95rem; line-height: 1.6; }
 .contact-info-item a   { color: var(--gold); text-decoration: underline; }
 
