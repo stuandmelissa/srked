@@ -4,9 +4,13 @@
   "description": "SRK Consulting - Educational Consulting & Tutoring",
   "main": "server.js",
   "scripts": {
+    "build": "echo build",
     "start": "node server.js",
     "dev": "nodemon server.js",
     "setup": "node db/setup.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
