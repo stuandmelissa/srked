@@ -130,10 +130,15 @@ h1, h2, h3, h4 {
 }
 .nav-mobile a:hover { color: var(--gold); }
 
+.nav-pay-btn { display: none; }
+
 @media (min-width: 768px) {
   .nav-links  { display: flex; }
   .nav-toggle { display: none; }
+  .nav-pay-btn { display: inline-block; }
 }
+
+.nav-mobile-pay { color: var(--gold) !important; }
 
 .page-content { padding-top: 64px; }
 

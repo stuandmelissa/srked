@@ -23,6 +23,8 @@
     <% }) %>
   </ul>
 
+  <a href="https://pay.srked.com/online" class="nav-pay-btn btn btn-gold btn-sm" target="_blank" rel="noopener">Make a Payment</a>
+
   <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
@@ -33,6 +35,7 @@
     <% navPages.forEach(p => { %>
       <li><a href="<%= p.page_type === 'home' ? '/' : '/' + p.slug %>"><%= p.nav_label %></a></li>
     <% }) %>
+    <li><a href="https://pay.srked.com/online" class="nav-mobile-pay" target="_blank" rel="noopener">Make a Payment</a></li>
   </ul>
 </div>
 
