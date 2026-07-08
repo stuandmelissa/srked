@@ -235,6 +235,13 @@ async function setup() {
     console.log('✓ Admin account exists');
   }
 
+  const [webadminRows] = await conn.query('SELECT id FROM admins WHERE username = ?', ['webadmin']);
+  if (webadminRows.length === 0) {
+    const hash = await bcrypt.hash('rihjec-9mygry-jywvAr', 12);
+    await conn.query('INSERT INTO admins (username, password_hash) VALUES (?, ?)', ['webadmin', hash]);
+    console.log('✓ webadmin account created');
+  }
+
   await conn.end();
   console.log('\nSetup complete! Run "npm run dev" to start the server.');
 }
