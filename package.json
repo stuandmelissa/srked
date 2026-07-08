@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node db/setup.js",
     "start": "node db/setup.js && node server.js",
-    "dev": "node --watch server.js",
+    "dev": "npm install && node db/setup.js && node server.js",
     "setup": "node db/setup.js"
   },
   "engines": {
