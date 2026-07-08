@@ -1,4 +1,4 @@
 {
   "serveCommand": "npm start",
-  "buildCommand": "node db/setup.js"
+  "buildCommand": "echo build"
 }
